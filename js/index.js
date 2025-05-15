@@ -15,6 +15,17 @@ function saveData() {
     alert("Invalid data!");
     return; // abort function
   }
+
+  // retrieve the Key "Park_ID" stored in localStorage
+  var fieldID = localStorage.getItem("Park_ID");
+
+  if (isNaN(fieldID) || fieldID == null) {
+    //null
+    fieldID = 1;
+  } else {
+    fieldID = parseInt(fieldID) + 1;
+  }
+
   var fieldDate = new Date();
   // console.log(campoData);
   // Guardar os dados no LocalStorage
@@ -22,6 +33,9 @@ function saveData() {
   localStorage.setItem("Park_Color", fieldColor);
   localStorage.setItem("Park_Section", fieldSection);
   localStorage.setItem("Park_Number", fieldNumber);
+
+  // update Park_ID
+  localStorage.setItem("Park_ID", fieldID);
   // alert("Place saved!");
   var MessageSuccess = new bootstrap.Modal(
     document.getElementById("MessageModal"),
@@ -37,6 +51,7 @@ function saveData() {
 
 function showData() {
   // recuperar dados do localStorage
+  var fieldID = localStorage.getItem("Park_ID");
   var fieldDate = localStorage.getItem("Park_Date");
   var fieldColor = localStorage.getItem("Park_Color");
   var fieldSection = localStorage.getItem("Park_Section");
@@ -47,6 +62,9 @@ function showData() {
   // console.log(fieldNumber);
   var textData = "";
   textData =
+    "<p>" +
+    fieldID + 
+    "</p>" +
     "<p>" +
     fieldDate +
     "</p>" +
@@ -81,4 +99,62 @@ function showData() {
       document.getElementById("divData").style.backgroundColor = "orange";
       break;
   }
+}
+
+///Funciton to clear the store history of the places
+function clearHistoric() {
+  // retrive key Estaciona_ID guardado no localStorage
+  var fieldID = localStorage.getItem("Park_ID");
+  if (isNaN(fieldID) || fieldID == null) {
+    //null
+    alert("Sem registo de lugares");
+    return;
+  }
+
+  for (var i = 1; i <= fieldID; i++) {
+    localStorage.removeItem("Park_Date_" + i);
+    localStorage.removeItem("Park_Color_" + i);
+    localStorage.removeItem("Park_Section_" + i);
+    localStorage.removeItem("Park_Number_" + i);
+  }
+
+  // update Park_ID
+  localStorage.setItem("Park_ID", 0);
+}
+
+///Function to store the localitation of the place
+function savePosition() {
+  navigator.geolocation.getCurrentPosition(function (position) {
+    var lat = position.coords.latitude;
+    var long = position.coords.longitude;
+
+    // alert("LAT: " + lat);
+
+    localStorage.setItem("Park_lat", lat);
+    localStorage.setItem("Park_long", long);
+  });
+}
+
+///Fuction to draw a map in the HTML. You need to use this elements
+/*   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&callback=myMap"></script> 
+       <div id="googleMap" style="width:100%;height:400px;"></div> 
+  */
+function drawMap(fieldID) {
+  var lat = localStorage.getItem("Park_lat_" + fieldID);
+  var long = localStorage.getItem("Park_long_" + fieldID);
+
+  var mapProp = {
+    center: new google.maps.LatLng(lat, long),
+    zoom: 18,
+  };
+  var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+  var myLatlng = new google.maps.LatLng(lat, long);
+  var marker = new google.maps.Marker({
+    position: myLatlng,
+    map: map,
+    title: "Titulo",
+  });
+
+  marker.setMap(map);
 }
