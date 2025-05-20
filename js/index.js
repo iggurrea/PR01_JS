@@ -25,20 +25,18 @@ function saveData() {
   } else {
     fieldID = parseInt(fieldID) + 1;
   }
+
+  var fieldDate = new Date();
+  // console.log(campoData);
+  // Guardar os dados no LocalStorage
+  localStorage.setItem("Park_Date", fieldDate);
+  localStorage.setItem("Park_Color", fieldColor);
+  localStorage.setItem("Park_Section", fieldSection);
+  localStorage.setItem("Park_Number", fieldNumber);
+  localStorage.setItem("Status", "Current");
+
   // update Park_ID
   localStorage.setItem("Park_ID", fieldID);
-
-  const entry = {
-    id: fieldID,
-    date: new Date().toString(),
-    color: fieldColor,
-    section: fieldSection,
-    number: fieldNumber,
-    status: "Current",
-  };
-
-  localStorage.setItem(`Park_${fieldID}`, JSON.stringify(entry));
-
   // alert("Place saved!");
   var MessageSuccess = new bootstrap.Modal(
     document.getElementById("MessageModal"),
@@ -47,133 +45,99 @@ function saveData() {
     }
   );
   MessageSuccess.show();
-
   document.getElementById("inputColor").value = "";
   document.getElementById("inputSection").value = "";
   document.getElementById("inputNumber").value = "";
 } //saveData
 
 function showData() {
-  const container = document.getElementById("divData");
-  container.innerHTML = "";
+  // recuperar dados do localStorage
+  var fieldID = localStorage.getItem("Park_ID");
+  var fieldDate = localStorage.getItem("Park_Date");
+  var fieldColor = localStorage.getItem("Park_Color");
+  var fieldSection = localStorage.getItem("Park_Section");
+  var fieldNumber = localStorage.getItem("Park_Number");
+  var status = localStorage.getItem("Status");
+  // console.log(fieldDate);
+  // console.log(fieldColor);
+  // console.log(fieldSection);
+  // console.log(fieldNumber);
+  if (status == "Current"){
+        var textData = "";
+  textData =
+    "<p>" +
+    fieldID +
+    "</p>" +
+    "<p>" +
+    fieldDate +
+    "</p>" +
+    "<p>" +
+    fieldColor +
+    "</p>" +
+    "<p>" +
+    fieldSection +
+    "</p>" +
+    "<p>" +
+    fieldNumber +
+    "</p>";
+  document.getElementById("divData").innerHTML = textData;
 
-  const fieldID = localStorage.getItem("Park_ID");
-  if (!fieldID) return;
+  // change div "datadiv" background color
+  switch (fieldColor) {
+    case "Yellow":
+      document.getElementById("divData").style.backgroundColor = "yellow";
+      break;
+    case "Red":
+      document.getElementById("divData").style.backgroundColor = "red";
+      document.getElementById("divData").style.color = "white";
+      break;
+    case "Green":
+      document.getElementById("divData").style.backgroundColor = "green";
+      document.getElementById("divData").style.color = "white";
+      break;
+    case "Blue":
+      document.getElementById("divData").style.backgroundColor = "blue";
+      document.getElementById("divData").style.color = "white";
+      break;
+    case "Orange":
+      document.getElementById("divData").style.backgroundColor = "orange";
+      break;
+  }
 
-  for (let i = 1; i <= fieldID; i++) {
-    const item = localStorage.getItem(`Park_${i}`);
-    if (!item) continue;
-
-    const data = JSON.parse(item);
-    if (data.status !== "Current") continue;
-
-    const div = document.createElement("div");
-    div.classList.add("mb-3", "p-3", "rounded");
-    div.style.backgroundColor = data.color.toLowerCase();
-    div.style.color = ["red", "blue", "green"].includes(
-      data.color.toLowerCase()
-    )
-      ? "white"
-      : "black";
-
-    div.innerHTML = `
-      <p><strong>ID:</strong> ${data.id}</p>
-      <p><strong>Date:</strong> ${data.date}</p>
-      <p><strong>Color:</strong> ${data.color}</p>
-      <p><strong>Section:</strong> ${data.section}</p>
-      <p><strong>Number:</strong> ${data.number}</p>
-      <button onclick="deletePlace(${data.id})" class="btn btn-sm btn-warning">Delete</button>
-    `;
-
-    container.appendChild(div);
-
-    /*
+  /*
   savePosition();
   drawMap(fieldID);
   */
   }
+
 }
 
-function deletePlace(id) {
-  const item = localStorage.getItem(`Park_${id}`);
-  if (!item) return;
-
-  let data = JSON.parse(item);
-  data.status = "History";
-  localStorage.setItem(`Park_${id}`, JSON.stringify(data));
-
-  showData(); // Refresh the view
+function deleteData(){
+  var textData = "";
+  document.getElementById("divData").innerHTML = textData;
+  document.getElementById("divData").style.backgroundColor = "white";
+  localStorage.setItem("Status", "History");
 }
-
-function deleteData() {
-  localStorage.setItem("Park_Status_" + id, "History");
-  showData();
-
-  const fieldID = localStorage.getItem("Park_ID");
-  if (!fieldID) return;
-
-  for (let i = 1; i <= fieldID; i++) {
-    let item = localStorage.getItem(`Park_${i}`);
-    if (!item) continue;
-
-    let data = JSON.parse(item);
-    if (data.status === "Current") {
-      data.status = "History";
-      localStorage.setItem(`Park_${i}`, JSON.stringify(data));
-    }
-  }
-  showData(); // Refresh to see anything
-}
-
-function showHistory() {
-  var displayDiv = document.getElementById("dataDisplay");
-  displayDiv.innerHTML = ""; // limpiar todo primero
-
-  var fieldID = localStorage.getItem("Park_ID");
-  if (isNaN(fieldID) || fieldID == null) return;
-
-  for (var i = 1; i <= fieldID; i++) {
-    let status = localStorage.getItem("Park_Status_" + i);
-    if (status !== "History") continue;
-
-    let date = localStorage.getItem("Park_Date_" + i);
-    let color = localStorage.getItem("Park_Color_" + i);
-    let section = localStorage.getItem("Park_Section_" + i);
-    let number = localStorage.getItem("Park_Number_" + i);
-
-    let card = `
-      <div class="card mb-3 p-3">
-        <p><strong>ID:</strong> ${i}</p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Color:</strong> ${color}</p>
-        <p><strong>Section:</strong> ${section}</p>
-        <p><strong>Number:</strong> ${number}</p>
-      </div>
-    `;
-
-    displayDiv.innerHTML += card;
-  }
-}
-
-
 
 ///Funciton to clear the store history of the places
-function deleteHistory() {
+function clearHistoric() {
+  // retrive key Estaciona_ID guardado no localStorage
   var fieldID = localStorage.getItem("Park_ID");
-  if (isNaN(fieldID) || fieldID == null) return;
-
-  for (var i = 1; i <= fieldID; i++) {
-    var status = localStorage.getItem("Park_Status_" + i);
-    if (status === "History") {
-      localStorage.removeItem("Park_Date_" + i);
-      localStorage.removeItem("Park_Color_" + i);
-      localStorage.removeItem("Park_Section_" + i);
-      localStorage.removeItem("Park_Number_" + i);
-      localStorage.removeItem("Park_Status_" + i);
-    }
+  if (isNaN(fieldID) || fieldID == null) {
+    //null
+    alert("Sem registo de lugares");
+    return;
   }
 
-  showHistory();
+  for (var i = 1; i <= fieldID; i++) {
+    localStorage.removeItem("Park_Date_" + i);
+    localStorage.removeItem("Park_Color_" + i);
+    localStorage.removeItem("Park_Section_" + i);
+    localStorage.removeItem("Park_Number_" + i);
+  }
+
+  // update Park_ID
+  localStorage.setItem("Park_ID", 0);
 }
 
 ///Function to store the localitation of the place
@@ -212,3 +176,4 @@ function drawMap() {
 
   marker.setMap(map);
 }
+
