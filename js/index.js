@@ -37,6 +37,7 @@ function saveData() {
 
   // update Park_ID
   localStorage.setItem("Park_ID", fieldID);
+
   // alert("Place saved!");
   var MessageSuccess = new bootstrap.Modal(
     document.getElementById("MessageModal"),
@@ -62,54 +63,109 @@ function showData() {
   // console.log(fieldColor);
   // console.log(fieldSection);
   // console.log(fieldNumber);
-  if (status == "Current"){
-        var textData = "";
-  textData =
-    "<p>" +
-    fieldID +
-    "</p>" +
-    "<p>" +
-    fieldDate +
-    "</p>" +
-    "<p>" +
-    fieldColor +
-    "</p>" +
-    "<p>" +
-    fieldSection +
-    "</p>" +
-    "<p>" +
-    fieldNumber +
-    "</p>";
-  document.getElementById("divData").innerHTML = textData;
+  if (status == "Current") {
+    var textData = "";
+    textData =
+      "<p>" +
+      fieldID +
+      "</p>" +
+      "<p>" +
+      fieldDate +
+      "</p>" +
+      "<p>" +
+      fieldColor +
+      "</p>" +
+      "<p>" +
+      fieldSection +
+      "</p>" +
+      "<p>" +
+      fieldNumber +
+      "</p>";
+    document.getElementById("divData").innerHTML = textData;
 
-  // change div "datadiv" background color
-  switch (fieldColor) {
-    case "Yellow":
-      document.getElementById("divData").style.backgroundColor = "yellow";
-      break;
-    case "Red":
-      document.getElementById("divData").style.backgroundColor = "red";
-      document.getElementById("divData").style.color = "white";
-      break;
-    case "Green":
-      document.getElementById("divData").style.backgroundColor = "green";
-      document.getElementById("divData").style.color = "white";
-      break;
-    case "Blue":
-      document.getElementById("divData").style.backgroundColor = "blue";
-      document.getElementById("divData").style.color = "white";
-      break;
-    case "Orange":
-      document.getElementById("divData").style.backgroundColor = "orange";
-      break;
-  }
+    // change div "datadiv" background color
+    switch (fieldColor) {
+      case "Yellow":
+        document.getElementById("divData").style.backgroundColor = "yellow";
+        break;
+      case "Red":
+        document.getElementById("divData").style.backgroundColor = "red";
+        document.getElementById("divData").style.color = "white";
+        break;
+      case "Green":
+        document.getElementById("divData").style.backgroundColor = "green";
+        document.getElementById("divData").style.color = "white";
+        break;
+      case "Blue":
+        document.getElementById("divData").style.backgroundColor = "blue";
+        document.getElementById("divData").style.color = "white";
+        break;
+      case "Orange":
+        document.getElementById("divData").style.backgroundColor = "orange";
+        break;
+    }
 
-  /*
+    /*
   savePosition();
   drawMap(fieldID);
   */
   }
+}
 
+function showHistoric() {
+  // loop through the entire contents of localStorage
+  // for (var key in localStorage)
+  // {
+  // //alert(key);
+  // }
+  //
+  // retrive key Estaciona_ID guardado no localStorage
+  var fieldID = localStorage.getItem("Park_ID");
+  if (isNaN(fieldID) || fieldID == null) {
+    //null
+    alert("Sem registo de lugares");
+    return;
+  }
+  var TextHTML = "";
+  for (var i = fieldID; i >= 1; i--) {
+    var fieldDate = localStorage.getItem("Park_Date_" + i);
+    var fieldColor = localStorage.getItem("Park_Color_" + i);
+    var fieldSeccao = localStorage.getItem("Park_Section_" + i);
+    var fieldNumero = localStorage.getItem("Park_Number_" + i);
+    var colorBack, colorFace;
+    switch (fieldColor) {
+      case "Yellow":
+        colorBack = "yellow";
+        colorFace = "black";
+        break;
+      case "Red":
+        colorBack = "red";
+        colorFace = "white";
+        break;
+      case "Green":
+        colorBack = "green";
+        colorFace = "white";
+        break;
+      case "Blue":
+        colorBack = "blue";
+        colorFace = "white";
+        break;
+      case "Orange":
+        colorBack = "orange";
+        colorFace = "black";
+        break;
+    }
+    TextHTML +=
+      "<div style='background-color:" +
+      colorBack +
+      "; color:" +
+      colorFace +
+      "'>";
+    TextHTML += "<p style='font-size:8pt;'>" + fieldDate + "</p>";
+    TextHTML += "<p>" + fieldSeccao + " - " + fieldNumero + "</p>";
+    TextHTML += "</div>";
+  }
+  document.getElementById("divHistoric").innerHTML = TextHTML;
 }
 
 function deleteData(){
@@ -128,14 +184,12 @@ function clearHistoric() {
     alert("Sem registo de lugares");
     return;
   }
-
   for (var i = 1; i <= fieldID; i++) {
     localStorage.removeItem("Park_Date_" + i);
     localStorage.removeItem("Park_Color_" + i);
     localStorage.removeItem("Park_Section_" + i);
     localStorage.removeItem("Park_Number_" + i);
   }
-
   // update Park_ID
   localStorage.setItem("Park_ID", 0);
 }
@@ -176,4 +230,3 @@ function drawMap() {
 
   marker.setMap(map);
 }
-
